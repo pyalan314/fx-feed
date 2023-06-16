@@ -1,16 +1,33 @@
+import time
+
 import pandas as pd
 import requests
+from loguru import logger
+from requests.exceptions import RequestException, HTTPError
 
 
 class IbRate:
 
-    def __init__(self):
-        self._table = self.update()
+    max_retry = 3
 
-    def update(self):
+    def __init__(self):
+        self._table = self._try_update()
+
+    def _try_update(self):
+        for i in range(self.max_retry):
+            try:
+                return self._update()
+            except RequestException as e:
+                logger.warning(str(e))
+                time.sleep(5)
+        return []
+
+    def _update(self):
         # TODO pd warning 'A value is trying to be set on a copy of a slice from a DataFrame.'
         url = 'https://www.interactivebrokers.com/en/accounts/fees/pricing-interest-rates.php'
         resp = requests.get(url, timeout=5)
+        if resp.status_code != 200:
+            raise HTTPError(f'status code = {resp.status_code}')
         html = pd.read_html(resp.text)
         df = html[1]
         df['Currency'] = df['Currency'].shift(1)
