@@ -2,3 +2,5 @@ requests
 icecream
 pandas
 loguru
+bs4
+lxml
