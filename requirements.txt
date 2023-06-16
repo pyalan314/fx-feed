@@ -1,0 +1,4 @@
+requests
+icecream
+pandas
+loguru
