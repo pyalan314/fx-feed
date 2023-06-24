@@ -4,3 +4,6 @@ pandas
 loguru
 bs4
 lxml
+networkx
+matplotlib
+tenacity
